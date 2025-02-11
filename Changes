@@ -5,6 +5,10 @@ OCaml 5.3 maintenance version
   demarshaling.
   (Benoît Vaugon, review by David Allsopp and Gabriel Scherer)
 
+- #13790: Fix bytecode-only build of Cygwin when flexlink is being bootstrapped
+  with the compiler.
+  (David Allsopp, review by Antonin Décimo and Miod Vallat)
+
 OCaml 5.3.0 (8 January 2025)
 ----------------------------
 
