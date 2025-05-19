@@ -236,8 +236,8 @@ OCaml 5.3.0 (8 January 2025)
 
 - #13197: Dynarray.blit, which allows to extend the destination
   dynarray (0 <= dst_pos <= dst_length).
-  (Gabriel Scherer, report by Hazem Elmasry,
-   review by Olivier Nicole, Hazem Elmasry and Nicolás Ojeda Bär)
+  (Gabriel Scherer, report by Hazem ElMasry,
+   review by Olivier Nicole, Hazem ElMasry and Nicolás Ojeda Bär)
 
 * #13240: Add Uchar.seeded_hash, Change Uchar.hash implementation.
   Previously, Uchar.hash was aliased to Uchar.to_int. If you need that behavior,
@@ -346,7 +346,7 @@ OCaml 5.3.0 (8 January 2025)
 
 - #13469, #13474, #13535: Document that [Hashtbl.create n] creates a hash table
   with a default minimal size, even if [n] is very small or negative.
-  (Antonin Décimo, Nick Bares, report by Nikolaus Huber and Jan Midtgaard,
+  (Antonin Décimo, Nick Barnes, report by Nikolaus Huber and Jan Midtgaard,
    review by Florian Angeletti, Anil Madhavapeddy, Gabriel Scherer,
    and Miod Vallat)
 
