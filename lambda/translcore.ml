@@ -183,6 +183,12 @@ let is_omitted = function
   | Arg _ -> false
   | Omitted () -> true
 
+let is_ttype_of = function
+  | {exp_desc = Texp_assert _;
+     exp_attributes = [{attr_name = {txt = "%t"}}]; exp_env = env; exp_type = ty} ->
+      Typeopt.is_ttype env ty
+  | _ -> None
+
 let rec transl_exp ~scopes e =
   transl_exp1 ~scopes ~in_new_scope:false e
 
@@ -204,6 +210,10 @@ and transl_exp1 ~scopes ~in_new_scope e =
   Translobj.oo_wrap e.exp_env true (transl_exp0 ~scopes ~in_new_scope) e
 
 and transl_exp0 ~in_new_scope ~scopes e =
+  match is_ttype_of e with
+  | Some _ty ->
+    assert false
+  | None ->
   match e.exp_desc with
   | Texp_ident(path, _, desc) ->
       transl_ident (of_location ~scopes e.exp_loc)
