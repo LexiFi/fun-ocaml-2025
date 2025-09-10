@@ -39,3 +39,11 @@ module Id = struct
     =
     match A.Id with B.Id -> Some Equal | _ -> None
 end
+
+type stype =
+  | Int
+  | String
+
+type 'a ttype = stype
+
+let stype_of_ttype ty = ty
