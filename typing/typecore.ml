@@ -3902,6 +3902,15 @@ and type_expect_
     exp
   in
   match sexp.pexp_desc with
+  | Pexp_extension ({txt="t"}, PTyp ct) ->
+      let sexp =
+        let open Ast_helper in
+        let open Location in
+        let attrs = [Attr.mk (mknoloc "%t") (PStr[])] in
+        Exp.constraint_ ~attrs (Exp.assert_ (Exp.construct (mknoloc (Longident.Lident "false")) None))
+          (Typ.constr (mknoloc (Longident.Ldot (mknoloc (Longident.Lident "Stdlib__Type"), mknoloc "ttype"))) [ct])
+      in
+      type_expect env sexp ty_expected_explained
   | Pexp_ident lid ->
       let path, desc = type_ident env ~recarg lid in
       let exp_desc =
