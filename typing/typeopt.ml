@@ -238,3 +238,10 @@ let classify_lazy_argument : Typedtree.expression ->
 let value_kind_union k1 k2 =
   if k1 = k2 then k1
   else Pgenval
+
+let ttype_path = Path.Pdot (Path.Pident (Ident.create_persistent "Stdlib__Type"), "ttype")
+
+let is_ttype env ty =
+  match scrape env ty with
+  | Some (Tconstr(p, [ty], _)) when Path.same p ttype_path -> Some ty
+  | _ -> None
