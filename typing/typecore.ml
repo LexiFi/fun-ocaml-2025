@@ -3907,7 +3907,7 @@ and type_expect_
         let open Ast_helper in
         let open Location in
         let attrs = [Attr.mk (mknoloc "%t") (PStr[])] in
-        Exp.constraint_ ~attrs (Exp.assert_ (Exp.construct (mknoloc (Longident.Lident "false")) None))
+        Exp.constraint_ (Exp.assert_ ~attrs (Exp.construct (mknoloc (Longident.Lident "false")) None))
           (Typ.constr (mknoloc (Longident.Ldot (mknoloc (Longident.Lident "Stdlib__Type"), mknoloc "ttype"))) [ct])
       in
       type_expect env sexp ty_expected_explained
