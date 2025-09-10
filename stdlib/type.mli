@@ -117,3 +117,11 @@ end
 ]}
 *)
 end
+
+type stype =
+  | Int
+  | String
+
+type 'a ttype
+
+val stype_of_ttype: 'a ttype -> stype
