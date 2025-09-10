@@ -187,6 +187,27 @@ let is_ttype_of = function
   | {exp_desc = Texp_assert _; exp_env = env; exp_type = ty} -> Typeopt.is_ttype env ty
   | _ -> None
 
+exception Unsupported of type_expr
+
+let () =
+  Location.register_error_of_exn (function
+    | Unsupported ty -> Some (Location.errorf "Unsupported type: %a" Printtyp.Doc.type_expr ty)
+    | _ -> None
+  )
+
+let const_obj (obj : Obj.t) : structured_constant =
+  assert (Obj.is_int obj);
+  Const_base (Const_int (Obj.obj obj))
+
+let stype_of_type ty =
+  match get_desc ty with
+  | Tconstr(path, [], _) when Path.same path Predef.path_int -> Type.Int
+  | Tconstr(path, [], _) when Path.same path Predef.path_string -> Type.String
+  | _ -> raise (Unsupported ty)
+
+let transl_stype stype =
+  Lconst (const_obj (Obj.repr stype))
+
 let rec transl_exp ~scopes e =
   transl_exp1 ~scopes ~in_new_scope:false e
 
@@ -209,8 +230,8 @@ and transl_exp1 ~scopes ~in_new_scope e =
 
 and transl_exp0 ~in_new_scope ~scopes e =
   match is_ttype_of e with
-  | Some _ty ->
-    assert false
+  | Some ty ->
+  transl_stype (stype_of_type ty)
   | None ->
   match e.exp_desc with
   | Texp_ident(path, _, desc) ->
