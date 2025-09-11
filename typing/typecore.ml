@@ -27,6 +27,13 @@ open Typedtree
 open Btype
 open Ctype
 
+let mk_ttype_of ct =
+  let open Ast_helper in
+  let open Location in
+  let attrs = [Attr.mk (mknoloc "%t") (PStr[])] in
+  Exp.constraint_ (Exp.assert_ ~attrs (Exp.construct (mknoloc (Longident.Lident "false")) None))
+    (Typ.constr (mknoloc (Longident.Ldot (mknoloc (Longident.Lident "Stdlib__Type"), mknoloc "ttype"))) [ct])
+
 module Style = Misc.Style
 
 type type_forcing_context =
@@ -3007,6 +3014,11 @@ let collect_apply_args env funct ignore_labels ty_fun ty_fun0 sargs =
                     (Warnings.Nonoptional_label (Asttypes.string_of_label l));
                 remaining_sargs, Some (sarg, l'), TypeSet.empty, false
             | None ->
+                let `Arrow (ty_arg, _, _, _) = arrow_kind in
+                match Typeopt.is_ttype env ty_arg with
+                | Some _ when not optional && label_name l <> "" ->
+                sargs, Some (mk_ttype_of (Ast_helper.Typ.any ()), l), TypeSet.empty, false
+                | _ ->
                 if TypeSet.mem ty_fun visited then
                   sargs, None, visited, true
                 else
@@ -3903,14 +3915,7 @@ and type_expect_
   in
   match sexp.pexp_desc with
   | Pexp_extension ({txt="t"}, PTyp ct) ->
-      let sexp =
-        let open Ast_helper in
-        let open Location in
-        let attrs = [Attr.mk (mknoloc "%t") (PStr[])] in
-        Exp.constraint_ (Exp.assert_ ~attrs (Exp.construct (mknoloc (Longident.Lident "false")) None))
-          (Typ.constr (mknoloc (Longident.Ldot (mknoloc (Longident.Lident "Stdlib__Type"), mknoloc "ttype"))) [ct])
-      in
-      type_expect env sexp ty_expected_explained
+      type_expect env (mk_ttype_of ct) ty_expected_explained
   | Pexp_ident lid ->
       let path, desc = type_ident env ~recarg lid in
       let exp_desc =
