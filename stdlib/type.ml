@@ -47,3 +47,6 @@ type stype =
 type 'a ttype = stype
 
 let stype_of_ttype ty = ty
+
+let equal (ty1 : stype) (ty2 : stype) =
+  if ty1 = ty2 then Some (Obj.magic Equal) else None

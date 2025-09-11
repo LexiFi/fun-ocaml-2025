@@ -125,3 +125,5 @@ type stype =
 type 'a ttype
 
 val stype_of_ttype: 'a ttype -> stype
+
+val equal: 'a ttype -> 'b ttype -> ('a, 'b) eq option
