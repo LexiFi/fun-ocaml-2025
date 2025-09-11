@@ -51,3 +51,9 @@ let stype_of_ttype ty = ty
 
 let equal (ty1 : stype) (ty2 : stype) =
   if ty1 = ty2 then Some (Obj.magic Equal) else None
+
+type 'a is_list = Is_list: 'b ttype * ('a, 'b list) eq -> 'a is_list
+
+let is_list = function
+  | List stype -> Some (Is_list(stype, Obj.magic Equal))
+  | _ -> None

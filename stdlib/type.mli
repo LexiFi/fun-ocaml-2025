@@ -128,3 +128,7 @@ type 'a ttype
 val stype_of_ttype: 'a ttype -> stype
 
 val equal: 'a ttype -> 'b ttype -> ('a, 'b) eq option
+
+type 'a is_list = Is_list: 'b ttype * ('a, 'b list) eq -> 'a is_list
+
+val is_list: 'a ttype -> 'a is_list option
