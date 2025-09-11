@@ -195,14 +195,18 @@ let () =
     | _ -> None
   )
 
-let const_obj (obj : Obj.t) : structured_constant =
-  assert (Obj.is_int obj);
-  Const_base (Const_int (Obj.obj obj))
+let rec const_obj (obj : Obj.t) : structured_constant =
+  if Obj.is_int obj then
+    Const_base (Const_int (Obj.obj obj))
+  else
+    Const_block (Obj.tag obj,
+      List.init (Obj.size obj) (fun i -> const_obj (Obj.field obj i)))
 
-let stype_of_type ty =
+let rec stype_of_type ty =
   match get_desc ty with
   | Tconstr(path, [], _) when Path.same path Predef.path_int -> Type.Int
   | Tconstr(path, [], _) when Path.same path Predef.path_string -> Type.String
+  | Tconstr(path, [ty], _) when Path.same path Predef.path_list -> Type.List (stype_of_type ty)
   | _ -> raise (Unsupported ty)
 
 let transl_stype stype =

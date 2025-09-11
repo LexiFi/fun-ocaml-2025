@@ -43,6 +43,7 @@ end
 type stype =
   | Int
   | String
+  | List of stype
 
 type 'a ttype = stype
 
