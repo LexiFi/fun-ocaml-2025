@@ -212,16 +212,16 @@ let rec stype_of_type env ty =
   | Tconstr(path, [], _) when Path.same path Predef.path_string -> Type.String
   | Tconstr(path, [ty], _) when Path.same path Predef.path_list -> Type.List (stype_of_type env ty)
   | Ttuple tyl -> Type.Tuple (List.map (fun (_, ty) -> stype_of_type env ty) tyl)
-  | Tconstr(path, _tyl, _) ->
+  | Tconstr(path, tyl, _) ->
     let decl = Env.find_type path env in
     begin match decl with
     | {type_kind = Type_abstract _; type_manifest = Some ty} ->
         stype_of_type env ty
-    | {type_kind = Type_variant (cstrs, Variant_regular)} ->
+    | {type_kind = Type_variant (cstrs, Variant_regular); type_params} ->
         Type.Sum (List.map (fun (cstr : Types.constructor_declaration) ->
             Ident.name cstr.cd_id,
             match cstr.cd_args with
-            | Cstr_tuple tyl' -> List.map (stype_of_type env) tyl'
+            | Cstr_tuple tyl' -> List.map (fun ty' -> stype_of_type env (Ctype.apply env type_params ty' tyl)) tyl'
             | Cstr_record _ -> raise (Unsupported ty)
           ) cstrs)
     | _ ->
