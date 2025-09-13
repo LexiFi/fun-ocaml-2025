@@ -207,6 +207,7 @@ let rec stype_of_type env ty =
   | Tconstr(path, [], _) when Path.same path Predef.path_int -> Type.Int
   | Tconstr(path, [], _) when Path.same path Predef.path_string -> Type.String
   | Tconstr(path, [ty], _) when Path.same path Predef.path_list -> Type.List (stype_of_type env ty)
+  | Ttuple tyl -> Type.Tuple (List.map (fun (_, ty) -> stype_of_type env ty) tyl)
   | Tconstr(path, _tyl, _) ->
     let decl = Env.find_type path env in
     begin match decl with

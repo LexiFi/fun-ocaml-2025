@@ -44,6 +44,7 @@ type stype =
   | Int
   | String
   | List of stype
+  | Tuple of stype list
 
 type 'a ttype = stype
 
