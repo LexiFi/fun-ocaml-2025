@@ -202,11 +202,19 @@ let rec const_obj (obj : Obj.t) : structured_constant =
     Const_block (Obj.tag obj,
       List.init (Obj.size obj) (fun i -> const_obj (Obj.field obj i)))
 
-let rec stype_of_type ty =
+let rec stype_of_type env ty =
   match get_desc ty with
   | Tconstr(path, [], _) when Path.same path Predef.path_int -> Type.Int
   | Tconstr(path, [], _) when Path.same path Predef.path_string -> Type.String
-  | Tconstr(path, [ty], _) when Path.same path Predef.path_list -> Type.List (stype_of_type ty)
+  | Tconstr(path, [ty], _) when Path.same path Predef.path_list -> Type.List (stype_of_type env ty)
+  | Tconstr(path, _tyl, _) ->
+    let decl = Env.find_type path env in
+    begin match decl with
+    | {type_kind = Type_abstract _; type_manifest = Some ty} ->
+        stype_of_type env ty
+    | _ ->
+        raise (Unsupported ty)
+    end
   | _ -> raise (Unsupported ty)
 
 let transl_stype stype =
@@ -235,7 +243,7 @@ and transl_exp1 ~scopes ~in_new_scope e =
 and transl_exp0 ~in_new_scope ~scopes e =
   match is_ttype_of e with
   | Some ty ->
-  transl_stype (stype_of_type ty)
+  transl_stype (stype_of_type e.exp_env ty)
   | None ->
   match e.exp_desc with
   | Texp_ident(path, _, desc) ->
