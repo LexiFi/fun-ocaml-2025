@@ -7,5 +7,9 @@ let show (type a) ~(t: a Type.ttype) (x: a) : unit =
       print_char '[';
       List.iteri (fun i x -> if i > 0 then print_string "; "; show t x) (Obj.obj x);
       print_char ']'
+    | Tuple tl ->
+      print_char '(';
+      List.iteri (fun i t -> if i > 0 then print_string ", "; show t (Obj.field x i)) tl;
+      print_char ')'
   in
   show (Type.stype_of_ttype t) (Obj.repr x)
