@@ -123,6 +123,7 @@ type stype =
   | String
   | List of stype
   | Tuple of stype list
+  | Sum of (string * stype list) list
 
 type 'a ttype
 

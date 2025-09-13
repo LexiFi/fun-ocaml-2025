@@ -199,8 +199,12 @@ let rec const_obj (obj : Obj.t) : structured_constant =
   if Obj.is_int obj then
     Const_base (Const_int (Obj.obj obj))
   else
-    Const_block (Obj.tag obj,
-      List.init (Obj.size obj) (fun i -> const_obj (Obj.field obj i)))
+    let tag = Obj.tag obj in
+    if tag = Obj.string_tag then
+      Const_immstring (Obj.obj obj)
+    else
+      Const_block (tag,
+        List.init (Obj.size obj) (fun i -> const_obj (Obj.field obj i)))
 
 let rec stype_of_type env ty =
   match get_desc ty with
@@ -213,6 +217,13 @@ let rec stype_of_type env ty =
     begin match decl with
     | {type_kind = Type_abstract _; type_manifest = Some ty} ->
         stype_of_type env ty
+    | {type_kind = Type_variant (cstrs, Variant_regular)} ->
+        Type.Sum (List.map (fun (cstr : Types.constructor_declaration) ->
+            Ident.name cstr.cd_id,
+            match cstr.cd_args with
+            | Cstr_tuple tyl' -> List.map (stype_of_type env) tyl'
+            | Cstr_record _ -> raise (Unsupported ty)
+          ) cstrs)
     | _ ->
         raise (Unsupported ty)
     end
