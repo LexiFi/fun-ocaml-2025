@@ -3007,6 +3007,19 @@ let collect_apply_args env funct ignore_labels ty_fun ty_fun0 sargs =
                     (Warnings.Nonoptional_label (Asttypes.string_of_label l));
                 remaining_sargs, Some (sarg, l'), TypeSet.empty, false
             | None ->
+                let `Arrow (ty_arg, _, _, _) = arrow_kind in
+                match Typeopt.is_ttype env ty_arg with
+                | Some _ when not optional && label_name l <> "" ->
+                let sarg =
+                  let open Ast_helper in
+                  let open Location in
+                  let open Longident in
+                  Exp.constraint_
+                    (Exp.assert_ (Exp.construct (mknoloc (Lident "false")) None))
+                    (Typ.constr (mknoloc (Ldot (mknoloc (Lident "Stdlib__Type"), mknoloc "ttype"))) [Typ.any ()])
+                in
+                sargs, Some (sarg, l), TypeSet.empty, false
+                | _ ->
                 if TypeSet.mem ty_fun visited then
                   sargs, None, visited, true
                 else
